@@ -6,6 +6,7 @@ export default function Hero() {
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col">
       {/* Header */}
+      {/* asjbjhdfhjvfjhfv */}
       <div className="bg-slate-900 border-b border-slate-800 px-4 py-4">
         <div className="max-w-4xl mx-auto flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-xl">🏥</div>
