@@ -1,0 +1,194 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+const API = "http://localhost:5000/api";
+
+export default function HealthRecords() {
+  const navigate = useNavigate();
+  const [phone, setPhone] = useState("");
+  const [records, setRecords] = useState([]);
+  const [searched, setSearched] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [expanded, setExpanded] = useState(null);
+
+  const handleSearch = async () => {
+    if (!phone.match(/^[6-9]\d{9}$/)) {
+      setError("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`${API}/health-records/${phone}`);
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message);
+      setRecords(data.records);
+      setSearched(true);
+    } catch (err) {
+      setError(err.message || "Could not fetch records.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const statusColor = (status) => {
+    if (status === "completed") return "bg-emerald-900/40 text-emerald-400 border-emerald-800";
+    if (status === "confirmed") return "bg-blue-900/40 text-blue-400 border-blue-800";
+    return "bg-slate-700 text-slate-400 border-slate-600";
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-white">
+      {/* Header */}
+      <div className="bg-slate-900 border-b border-slate-800 px-4 py-4">
+        <div className="max-w-3xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button onClick={() => navigate("/")} className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-xl hover:bg-emerald-500 transition-colors">🏥</button>
+            <div>
+              <h1 className="text-white font-bold text-lg">Health Records</h1>
+              <p className="text-slate-400 text-xs">Your Medical History · RuralCare</p>
+            </div>
+          </div>
+          <button onClick={() => navigate("/consult")} className="text-xs bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl transition-colors font-semibold">
+            New Appointment →
+          </button>
+        </div>
+      </div>
+
+      <div className="max-w-3xl mx-auto px-4 py-8">
+
+        {/* Search */}
+        <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 mb-6">
+          <h2 className="text-white font-bold text-xl mb-1">View Your Records</h2>
+          <p className="text-slate-400 text-sm mb-5">Enter your registered mobile number</p>
+          <div className="flex gap-3">
+            <input
+              type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              placeholder="10-digit mobile number"
+              className="flex-1 bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+            />
+            <button
+              onClick={handleSearch} disabled={loading}
+              className={`px-6 py-3 rounded-xl font-bold text-sm transition-all ${loading ? "bg-emerald-800 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-500"} text-white shrink-0`}
+            >
+              {loading ? (
+                <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                </svg>
+              ) : "Search"}
+            </button>
+          </div>
+          {error && <p className="text-red-400 text-sm mt-3">⚠️ {error}</p>}
+        </div>
+
+        {/* Results */}
+        {searched && (
+          <>
+            {records.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="text-5xl mb-4">📋</div>
+                <p className="text-white font-semibold text-lg">No records found</p>
+                <p className="text-slate-400 text-sm mt-1 mb-6">No completed appointments for this number</p>
+                <button onClick={() => navigate("/consult")} className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold transition-all">
+                  Book First Appointment →
+                </button>
+              </div>
+            ) : (
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-slate-400 text-sm">{records.length} record{records.length !== 1 ? "s" : ""} found for <span className="text-white font-medium">{phone}</span></p>
+                </div>
+                <div className="space-y-4">
+                  {records.map((rec) => (
+                    <div key={rec._id} className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
+                      {/* Record Header */}
+                      <div
+                        className="p-5 cursor-pointer hover:bg-slate-700/30 transition-colors"
+                        onClick={() => setExpanded(expanded === rec._id ? null : rec._id)}
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            {rec.doctor && (
+                              <div className="w-11 h-11 rounded-xl flex items-center justify-center font-bold text-sm shrink-0"
+                                style={{ backgroundColor: rec.doctor.color + "33", border: `2px solid ${rec.doctor.color}`, color: rec.doctor.color }}>
+                                {rec.doctor.avatar}
+                              </div>
+                            )}
+                            <div>
+                              <p className="text-white font-semibold">{rec.doctor?.name || "Doctor"}</p>
+                              <p className="text-slate-400 text-xs">{rec.doctor?.specialty}</p>
+                            </div>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <p className="text-slate-400 text-xs">{rec.date}</p>
+                            <p className="text-slate-500 text-xs mt-0.5">{rec.bookingId}</p>
+                          </div>
+                        </div>
+
+                        {rec.symptoms && (
+                          <p className="text-slate-500 text-xs mt-3 bg-slate-700/40 rounded-lg px-3 py-2">
+                            🩺 {rec.symptoms}
+                          </p>
+                        )}
+
+                        <div className="flex items-center justify-between mt-3">
+                          <div className="flex gap-2">
+                            {rec.diagnosis && <span className="text-xs bg-emerald-900/40 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded-full">✓ Diagnosis added</span>}
+                            {rec.prescription && <span className="text-xs bg-blue-900/40 text-blue-400 border border-blue-800 px-2 py-0.5 rounded-full">💊 Prescription</span>}
+                          </div>
+                          <span className="text-slate-500 text-xs">{expanded === rec._id ? "▲ Hide" : "▼ Details"}</span>
+                        </div>
+                      </div>
+
+                      {/* Expanded Details */}
+                      {expanded === rec._id && (
+                        <div className="border-t border-slate-700 p-5 space-y-4 bg-slate-900/40">
+                          {rec.diagnosis ? (
+                            <div>
+                              <p className="text-slate-400 text-xs font-medium mb-1">🔍 DIAGNOSIS</p>
+                              <p className="text-white text-sm bg-slate-700/50 rounded-xl p-3">{rec.diagnosis}</p>
+                            </div>
+                          ) : (
+                            <p className="text-slate-600 text-sm italic">No diagnosis added yet</p>
+                          )}
+
+                          {rec.prescription && (
+                            <div>
+                              <p className="text-slate-400 text-xs font-medium mb-1">💊 PRESCRIPTION</p>
+                              <p className="text-white text-sm bg-slate-700/50 rounded-xl p-3 whitespace-pre-line">{rec.prescription}</p>
+                            </div>
+                          )}
+
+                          {rec.notes && (
+                            <div>
+                              <p className="text-slate-400 text-xs font-medium mb-1">📝 DOCTOR'S NOTES</p>
+                              <p className="text-white text-sm bg-slate-700/50 rounded-xl p-3">{rec.notes}</p>
+                            </div>
+                          )}
+
+                          {rec.followUpDate && (
+                            <div className="bg-yellow-900/20 border border-yellow-800/40 rounded-xl p-3 flex items-center gap-2">
+                              <span className="text-yellow-400">📅</span>
+                              <p className="text-yellow-300 text-sm">Follow-up: <strong>{rec.followUpDate}</strong></p>
+                            </div>
+                          )}
+
+                          <div className="pt-2 border-t border-slate-700/50">
+                            <p className="text-slate-600 text-xs">Patient: {rec.patientName}, Age {rec.patientAge} · {rec.patientVillage}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
