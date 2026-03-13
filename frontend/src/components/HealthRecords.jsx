@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 const API = "http://localhost:5000/api";
 
@@ -57,6 +59,114 @@ export default function HealthRecords() {
     if (status === "completed") return "bg-emerald-900/40 text-emerald-400 border-emerald-800";
     if (status === "confirmed") return "bg-blue-900/40 text-blue-400 border-blue-800";
     return "bg-slate-700 text-slate-400 border-slate-600";
+  };
+
+  const downloadPDF = (rec) => {
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFillColor(15, 23, 42);
+    doc.rect(0, 0, 210, 40, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(24);
+    doc.setFont(undefined, 'bold');
+    doc.text('Medical Prescription', 105, 20, { align: 'center' });
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text('RuralCare Telemedicine Platform', 105, 28, { align: 'center' });
+    
+    // Patient Info
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.text('Patient Information', 14, 50);
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(10);
+    doc.text(`Name: ${rec.patientName}`, 14, 58);
+    doc.text(`Age: ${rec.patientAge} years`, 14, 64);
+    doc.text(`Village: ${rec.patientVillage}`, 14, 70);
+    doc.text(`Phone: ${rec.patientPhone}`, 14, 76);
+    doc.text(`Date: ${rec.date}`, 14, 82);
+    doc.text(`Booking ID: ${rec.bookingId}`, 14, 88);
+    
+    // Doctor Info
+    doc.setFont(undefined, 'bold');
+    doc.setFontSize(12);
+    doc.text('Doctor Information', 120, 50);
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(10);
+    doc.text(`Dr. ${rec.doctor?.name || 'N/A'}`, 120, 58);
+    doc.text(`${rec.doctor?.specialty || 'N/A'}`, 120, 64);
+    
+    let yPos = 100;
+    
+    // Symptoms
+    if (rec.symptoms) {
+      doc.setFont(undefined, 'bold');
+      doc.setFontSize(12);
+      doc.text('Symptoms', 14, yPos);
+      doc.setFont(undefined, 'normal');
+      doc.setFontSize(10);
+      const symptomsLines = doc.splitTextToSize(rec.symptoms, 180);
+      doc.text(symptomsLines, 14, yPos + 6);
+      yPos += 6 + (symptomsLines.length * 5) + 8;
+    }
+    
+    // Diagnosis
+    if (rec.diagnosis) {
+      doc.setFont(undefined, 'bold');
+      doc.setFontSize(12);
+      doc.text('Diagnosis', 14, yPos);
+      doc.setFont(undefined, 'normal');
+      doc.setFontSize(10);
+      const diagnosisLines = doc.splitTextToSize(rec.diagnosis, 180);
+      doc.text(diagnosisLines, 14, yPos + 6);
+      yPos += 6 + (diagnosisLines.length * 5) + 8;
+    }
+    
+    // Prescription
+    if (rec.prescription) {
+      doc.setFont(undefined, 'bold');
+      doc.setFontSize(12);
+      doc.text('Prescription', 14, yPos);
+      doc.setFont(undefined, 'normal');
+      doc.setFontSize(10);
+      const prescriptionLines = doc.splitTextToSize(rec.prescription, 180);
+      doc.text(prescriptionLines, 14, yPos + 6);
+      yPos += 6 + (prescriptionLines.length * 5) + 8;
+    }
+    
+    // Notes
+    if (rec.notes) {
+      doc.setFont(undefined, 'bold');
+      doc.setFontSize(12);
+      doc.text("Doctor's Notes", 14, yPos);
+      doc.setFont(undefined, 'normal');
+      doc.setFontSize(10);
+      const notesLines = doc.splitTextToSize(rec.notes, 180);
+      doc.text(notesLines, 14, yPos + 6);
+      yPos += 6 + (notesLines.length * 5) + 8;
+    }
+    
+    // Follow-up
+    if (rec.followUpDate) {
+      doc.setFont(undefined, 'bold');
+      doc.setFontSize(12);
+      doc.text('Follow-up Date', 14, yPos);
+      doc.setFont(undefined, 'normal');
+      doc.setFontSize(10);
+      doc.text(rec.followUpDate, 14, yPos + 6);
+      yPos += 14;
+    }
+    
+    // Footer
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text('This is a computer-generated prescription from RuralCare Telemedicine Platform', 105, 280, { align: 'center' });
+    doc.text('For any queries, please contact your doctor', 105, 285, { align: 'center' });
+    
+    // Save PDF
+    doc.save(`Prescription_${rec.bookingId}_${rec.patientName}.pdf`);
   };
 
   return (
@@ -216,7 +326,18 @@ export default function HealthRecords() {
                           )}
 
                           <div className="pt-2 border-t border-slate-700/50">
-                            <p className="text-slate-600 text-xs">Patient: {rec.patientName}, Age {rec.patientAge} · {rec.patientVillage}</p>
+                            <div className="flex items-center justify-between">
+                              <p className="text-slate-600 text-xs">Patient: {rec.patientName}, Age {rec.patientAge} · {rec.patientVillage}</p>
+                              <button
+                                onClick={() => downloadPDF(rec)}
+                                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg transition-all duration-300 flex items-center gap-2 hover:scale-105"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Download PDF
+                              </button>
+                            </div>
                           </div>
                         </div>
                       )}
