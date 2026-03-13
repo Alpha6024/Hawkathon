@@ -1,0 +1,35 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_28-d69af0b8b6c6a1bc4c0f4bedb074026320327d42",
+  "solcVersion": "0.8.28",
+  "solcLongVersion": "0.8.28+commit.7893614a",
+  "userSourceNameMap": {
+    "contracts/DoctorContract.sol": "project/contracts/DoctorContract.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "cancun",
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/DoctorContract.sol": {
+        "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.28;\r\n\r\ncontract DoctorStore {\r\n\r\n    struct Doctor {\r\n        uint256 id;\r\n        string  name;\r\n        string  specialty;\r\n        string  experience;\r\n        uint256 fee;\r\n        bool    available;\r\n        uint256 timestamp;\r\n    }\r\n\r\n    Doctor[] public doctors;\r\n    uint256  public doctorCount;\r\n\r\n    // owner = deployer (hospital admin)\r\n    address public owner;\r\n\r\n    event DoctorRegistered(uint256 id, string name, string specialty, uint256 fee);\r\n    event DoctorUpdated(uint256 id, bool available);\r\n\r\n    modifier onlyOwner() {\r\n        require(msg.sender == owner, \"Only hospital admin can do this\");\r\n        _;\r\n    }\r\n\r\n    constructor() {\r\n        owner = msg.sender;\r\n    }\r\n\r\n    // Register a new doctor — only admin\r\n    function registerDoctor(\r\n        string memory _name,\r\n        string memory _specialty,\r\n        string memory _experience,\r\n        uint256 _fee\r\n    ) public onlyOwner {\r\n        doctorCount++;\r\n        doctors.push(Doctor({\r\n            id:         doctorCount,\r\n            name:       _name,\r\n            specialty:  _specialty,\r\n            experience: _experience,\r\n            fee:        _fee,\r\n            available:  true,\r\n            timestamp:  block.timestamp\r\n        }));\r\n        emit DoctorRegistered(doctorCount, _name, _specialty, _fee);\r\n    }\r\n\r\n    // Update availability — only admin\r\n    function setAvailability(uint256 _id, bool _available) public onlyOwner {\r\n        require(_id > 0 && _id <= doctorCount, \"Invalid doctor ID\");\r\n        doctors[_id - 1].available = _available;\r\n        emit DoctorUpdated(_id, _available);\r\n    }\r\n\r\n    // Get all doctors\r\n    function getAllDoctors() public view returns (Doctor[] memory) {\r\n        return doctors;\r\n    }\r\n\r\n    // Get single doctor\r\n    function getDoctor(uint256 _id) public view returns (Doctor memory) {\r\n        require(_id > 0 && _id <= doctorCount, \"Invalid doctor ID\");\r\n        return doctors[_id - 1];\r\n    }\r\n\r\n    // Get total count\r\n    function getCount() public view returns (uint256) {\r\n        return doctorCount;\r\n    }\r\n}\r\n"
+      }
+    }
+  }
+}
