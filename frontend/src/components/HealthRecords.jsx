@@ -4,7 +4,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { db } from "../db";
 
-const API = "http://localhost:5000/api";
+const API = "https://ruralcare-o2er.onrender.com/api";
 
 export default function HealthRecords() {
   const navigate = useNavigate();

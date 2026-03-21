@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const API = "http://localhost:5000/api";
+const API = "https://ruralcare-o2er.onrender.com/api";
 const TODAY = new Date().toISOString().split("T")[0];
 
 export default function dr() {

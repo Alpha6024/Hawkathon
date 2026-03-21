@@ -541,6 +541,8 @@ const autoSyncToBlockchain = async () => {
 };
  
 // Run auto-sync 3 seconds after backend starts (gives DB connection time to establish)
-setTimeout(autoSyncToBlockchain, 3000);
+if (process.env.NODE_ENV !== "production") {
+  setTimeout(autoSyncToBlockchain, 3000);
+}
 
 module.exports = app;

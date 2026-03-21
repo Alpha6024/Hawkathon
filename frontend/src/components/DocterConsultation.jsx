@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
-const API = "http://localhost:5000/api";
+const API = "https://ruralcare-o2er.onrender.com/api";
 const TODAY = new Date().toISOString().split("T")[0];
 
 const SPECIALTIES = ["All","General Physician","Cardiologist","Pediatrician","Gynecologist","Orthopedic","Dermatologist"];
