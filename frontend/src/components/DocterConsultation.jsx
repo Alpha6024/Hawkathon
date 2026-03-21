@@ -7,18 +7,18 @@ const TODAY = new Date().toISOString().split("T")[0];
 const SPECIALTIES = ["All","General Physician","Cardiologist","Pediatrician","Gynecologist","Orthopedic","Dermatologist"];
 
 function StepBar({ step }) {
-  const steps = ["Choose Doctor", "Pick Slot", "Your Details", "Confirm"];
+  const steps = ["Doctor", "Slot", "Details", "Confirm"];
   return (
-    <div className="flex items-center justify-center gap-0 mb-10">
+    <div className="flex items-center justify-center gap-0 mb-8">
       {steps.map((s, i) => (
         <div key={i} className="flex items-center">
           <div className="flex flex-col items-center">
-            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all duration-300 ${i < step ? "bg-emerald-500 border-emerald-500 text-white" : i === step ? "bg-white border-emerald-500 text-emerald-600" : "bg-slate-800 border-slate-600 text-slate-500"}`}>
+            <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold border-2 transition-all duration-300 ${i < step ? "bg-emerald-500 border-emerald-500 text-white" : i === step ? "bg-white border-emerald-500 text-emerald-600" : "bg-slate-800 border-slate-600 text-slate-500"}`}>
               {i < step ? "✓" : i + 1}
             </div>
             <span className={`text-xs mt-1 font-medium whitespace-nowrap ${i === step ? "text-emerald-400" : "text-slate-500"}`}>{s}</span>
           </div>
-          {i < steps.length - 1 && <div className={`w-16 h-0.5 mb-5 mx-1 transition-all duration-500 ${i < step ? "bg-emerald-500" : "bg-slate-700"}`} />}
+          {i < steps.length - 1 && <div className={`w-8 sm:w-14 h-0.5 mb-5 mx-1 transition-all duration-500 ${i < step ? "bg-emerald-500" : "bg-slate-700"}`} />}
         </div>
       ))}
     </div>
@@ -27,28 +27,28 @@ function StepBar({ step }) {
 
 function DoctorCard({ doctor, selected, onSelect }) {
   return (
-    <div onClick={() => onSelect(doctor)} className={`relative cursor-pointer rounded-2xl p-5 border-2 transition-all duration-300 hover:scale-[1.03] hover:-translate-y-1 ${selected ? "border-emerald-500 bg-emerald-950/30 shadow-lg shadow-emerald-900/30" : "border-slate-700 bg-slate-800/60 hover:border-slate-500 hover:shadow-xl"}`}>
-      {selected && <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-bold">✓</div>}
-      <div className="flex items-start gap-4">
-        <div className="w-14 h-14 rounded-xl flex items-center justify-center font-bold text-lg shrink-0" style={{ backgroundColor: doctor.color + "33", border: `2px solid ${doctor.color}` }}>
+    <div onClick={() => onSelect(doctor)} className={`relative cursor-pointer rounded-2xl p-4 border-2 transition-all duration-300 active:scale-95 ${selected ? "border-emerald-500 bg-emerald-950/30 shadow-lg shadow-emerald-900/30" : "border-slate-700 bg-slate-800/60 hover:border-slate-500"}`}>
+      {selected && <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-bold">✓</div>}
+      <div className="flex items-start gap-3">
+        <div className="w-11 h-11 rounded-xl flex items-center justify-center font-bold text-sm shrink-0" style={{ backgroundColor: doctor.color + "33", border: `2px solid ${doctor.color}` }}>
           <span style={{ color: doctor.color }}>{doctor.avatar}</span>
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-white font-semibold text-base">{doctor.name}</h3>
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${doctor.available ? "bg-emerald-900/50 text-emerald-400" : "bg-slate-700 text-slate-400"}`}>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <h3 className="text-white font-semibold text-sm">{doctor.name}</h3>
+            <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${doctor.available ? "bg-emerald-900/50 text-emerald-400" : "bg-slate-700 text-slate-400"}`}>
               {doctor.available ? "● Online" : "○ Busy"}
             </span>
           </div>
-          <p className="text-slate-400 text-sm">{doctor.specialty} · {doctor.experience}</p>
-          <div className="flex items-center gap-4 mt-2 flex-wrap">
-            <span className="text-yellow-400 text-sm">★ {doctor.rating}</span>
+          <p className="text-slate-400 text-xs">{doctor.specialty} · {doctor.experience}</p>
+          <div className="flex items-center gap-3 mt-1 flex-wrap">
+            <span className="text-yellow-400 text-xs">★ {doctor.rating}</span>
             <span className="text-slate-500 text-xs">{doctor.totalConsultations?.toLocaleString()} consults</span>
-            <span className="text-slate-500 text-xs">Next: {doctor.nextSlot}</span>
           </div>
-          <div className="flex items-center justify-between mt-3 flex-wrap gap-2">
+          <div className="flex items-center justify-between mt-2 flex-wrap gap-1">
             <div className="flex gap-1 flex-wrap">
-              {doctor.languages?.map((l) => <span key={l} className="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full">{l}</span>)}
+              {doctor.languages?.slice(0, 2).map((l) => <span key={l} className="text-xs bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded-full">{l}</span>)}
+              {doctor.languages?.length > 2 && <span className="text-xs text-slate-500">+{doctor.languages.length - 2}</span>}
             </div>
             <span className="text-emerald-400 font-semibold text-sm">₹{doctor.fee}</span>
           </div>
@@ -242,7 +242,7 @@ export default function DoctorConsultation() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-5">
         <StepBar step={step} />
 
         {apiError && (
@@ -255,11 +255,11 @@ export default function DoctorConsultation() {
         {/* STEP 0: Choose Doctor */}
         {step === 0 && (
           <div className="animate-fadeIn">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-white mb-1">Find a Doctor</h2>
+            <div className="mb-4">
+              <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">Find a Doctor</h2>
               <p className="text-slate-400 text-sm">Consult from home — no travel needed</p>
             </div>
-            <div className="flex flex-wrap gap-2 mb-6">
+            <div className="flex flex-wrap gap-2 mb-4">
               {SPECIALTIES.map((s) => (
                 <button key={s} onClick={() => setFilterSpec(s)} className={`text-xs px-3 py-1.5 rounded-full border transition-all ${filterSpec === s ? "bg-emerald-600 border-emerald-600 text-white" : "border-slate-700 text-slate-400 hover:border-slate-500"}`}>{s}</button>
               ))}
@@ -268,11 +268,11 @@ export default function DoctorConsultation() {
               </button>
             </div>
             {fetchingDoctors ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                {[1,2,3,4].map((i) => <div key={i} className="h-36 rounded-2xl bg-slate-800 animate-pulse" />)}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                {[1,2,3,4].map((i) => <div key={i} className="h-32 rounded-2xl bg-slate-800 animate-pulse" />)}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
                 {doctors.map((d) => <DoctorCard key={d._id} doctor={d} selected={selectedDoctor?._id === d._id} onSelect={setSelectedDoctor} />)}
               </div>
             )}
@@ -311,11 +311,11 @@ export default function DoctorConsultation() {
               </div>
             </div>
             {fetchingSlots ? (
-              <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-8">
-                {[...Array(15)].map((_, i) => <div key={i} className="h-12 rounded-xl bg-slate-800 animate-pulse" />)}
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-5">
+                {[...Array(15)].map((_, i) => <div key={i} className="h-10 rounded-xl bg-slate-800 animate-pulse" />)}
               </div>
             ) : (
-              <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-8">
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-5">
                 {slots.map(({ time, available }) => (
                   <button key={time} disabled={!available} onClick={() => setSelectedSlot(time)}
                     className={`py-2.5 px-2 rounded-xl border-2 text-sm font-medium transition-all ${selectedSlot === time ? "border-emerald-500 bg-emerald-950/50 text-emerald-400" : !available ? "border-slate-800 bg-slate-800/30 text-slate-700 cursor-not-allowed line-through" : "border-slate-700 text-slate-300 hover:border-emerald-600 hover:text-white"}`}>
@@ -370,7 +370,7 @@ export default function DoctorConsultation() {
             <h2 className="text-2xl font-bold text-white mb-1">Confirm Booking</h2>
             <p className="text-slate-400 text-sm mb-6">Review your appointment details</p>
             <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden mb-6">
-              <div className="p-5 border-b border-slate-700 flex items-center gap-4">
+              <div className="p-4 border-b border-slate-700 flex items-center gap-3">
                 <div className="w-14 h-14 rounded-xl flex items-center justify-center font-bold text-lg shrink-0" style={{ backgroundColor: selectedDoctor?.color + "33", color: selectedDoctor?.color }}>
                   {selectedDoctor?.avatar}
                 </div>
@@ -380,7 +380,7 @@ export default function DoctorConsultation() {
                   <p className="text-emerald-400 text-sm font-medium mt-0.5">★ {selectedDoctor?.rating} · {selectedDoctor?.experience}</p>
                 </div>
               </div>
-              <div className="p-5 space-y-3">
+              <div className="p-4 space-y-2">
                 {[
                   ["📅 Date",     "Today, " + new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })],
                   ["⏰ Time",     selectedSlot],
@@ -390,9 +390,9 @@ export default function DoctorConsultation() {
                   ["🏘️ Location", form.village],
                   form.symptoms ? ["🩺 Symptoms", form.symptoms] : null,
                 ].filter(Boolean).map(([label, value]) => (
-                  <div key={label} className="flex gap-3">
-                    <span className="text-slate-500 text-sm w-36 shrink-0">{label}</span>
-                    <span className="text-white text-sm">{value}</span>
+                  <div key={label} className="flex gap-2">
+                    <span className="text-slate-500 text-xs w-28 shrink-0">{label}</span>
+                    <span className="text-white text-xs sm:text-sm">{value}</span>
                   </div>
                 ))}
               </div>

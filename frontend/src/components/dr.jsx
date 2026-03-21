@@ -18,8 +18,7 @@ export default function dr() {
   useEffect(() => {
     const stored = localStorage.getItem("doctor");
     if (!stored) { navigate("/doctor-auth"); return; }
-    const doc = JSON.parse(stored);
-    setDoctor(doc);
+    setDoctor(JSON.parse(stored));
     setIsVisible(true);
   }, []);
 
@@ -102,75 +101,72 @@ export default function dr() {
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       {/* Header */}
-      <div className="bg-slate-900 border-b border-slate-800 px-4 py-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-lg transition-colors">←</button>
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-base shrink-0"
-                style={{ backgroundColor: (doctor.color || "#10b981") + "33", border: `2px solid ${doctor.color || "#10b981"}`, color: doctor.color || "#10b981" }}>
-                {doctor.avatar || doctor.name?.substring(0, 2).toUpperCase()}
-              </div>
-              <div>
-                <h1 className="text-white font-bold text-lg">{doctor.name}</h1>
-                <p className="text-slate-400 text-xs">{doctor.specialty} · Today's Dashboard</p>
-              </div>
+      <div className="bg-slate-900 border-b border-slate-800 px-4 py-3">
+        <div className="max-w-4xl mx-auto flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 flex items-center justify-center shrink-0 transition-colors">←</button>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm shrink-0"
+              style={{ backgroundColor: (doctor.color || "#10b981") + "33", border: `2px solid ${doctor.color || "#10b981"}`, color: doctor.color || "#10b981" }}>
+              {doctor.avatar || doctor.name?.substring(0, 2).toUpperCase()}
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-slate-400 text-xs hidden md:block">
-                {new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long" })}
-              </span>
-              <button onClick={handleLogout}
-                className="text-slate-400 hover:text-red-400 text-xs border border-slate-700 hover:border-red-700 px-3 py-2 rounded-lg transition-all">
-                Logout
-              </button>
+            <div className="min-w-0">
+              <h1 className="text-white font-bold text-sm sm:text-lg truncate">{doctor.name}</h1>
+              <p className="text-slate-400 text-xs truncate">{doctor.specialty}</p>
             </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-slate-400 text-xs hidden md:block">
+              {new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+            </span>
+            <button onClick={handleLogout}
+              className="text-slate-400 hover:text-red-400 text-xs border border-slate-700 hover:border-red-700 px-2.5 py-1.5 rounded-lg transition-all">
+              Logout
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto px-4 py-4">
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-6 transform transition-all duration-700 ease-out"
+        <div className="grid grid-cols-3 gap-3 mb-5 transition-all duration-700"
           style={{ transform: isVisible ? 'translateY(0)' : 'translateY(30px)', opacity: isVisible ? 1 : 0 }}>
           {[
             ["Total Today",  appointments.length,                                       "text-white"],
             ["Confirmed",    appointments.filter(a => a.status === "confirmed").length,  "text-emerald-400"],
             ["Completed",    appointments.filter(a => a.status === "completed").length,  "text-slate-400"],
           ].map(([label, count, color]) => (
-            <div key={label} className="bg-slate-800 rounded-xl p-4 border border-slate-700 text-center transition-all duration-300 hover:border-slate-600 hover:scale-105">
-              <p className={`text-2xl font-bold ${color}`}>{count}</p>
-              <p className="text-slate-500 text-xs mt-1">{label}</p>
+            <div key={label} className="bg-slate-800 rounded-xl p-3 border border-slate-700 text-center">
+              <p className={`text-xl sm:text-2xl font-bold ${color}`}>{count}</p>
+              <p className="text-slate-500 text-xs mt-0.5">{label}</p>
             </div>
           ))}
         </div>
 
         {/* Analytics */}
         {appointments.length > 0 && (
-          <div className="mb-6 space-y-4">
-            <h2 className="text-white font-bold text-lg mb-4">📊 Today's Analytics</h2>
+          <div className="mb-5 space-y-4">
+            <h2 className="text-white font-bold text-base">📊 Today's Analytics</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
-              <div className="bg-slate-800 rounded-2xl p-5 border border-slate-700">
-                <h3 className="text-white font-semibold text-sm mb-4">Appointments by Time Slot</h3>
-                <ResponsiveContainer width="100%" height={250}>
+              <div className="bg-slate-800 rounded-2xl p-4 border border-slate-700">
+                <h3 className="text-white font-semibold text-sm mb-3">Appointments by Time Slot</h3>
+                <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={getTimeSlotData()}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                    <XAxis dataKey="time" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 11 }} angle={-45} textAnchor="end" height={60} />
-                    <YAxis stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 12 }} />
+                    <XAxis dataKey="time" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 9 }} angle={-45} textAnchor="end" height={55} />
+                    <YAxis stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 11 }} />
                     <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }} labelStyle={{ color: '#e2e8f0' }} itemStyle={{ color: '#10b981' }} />
-                    <Bar dataKey="appointments" fill="#10b981" radius={[8, 8, 0, 0]} />
+                    <Bar dataKey="appointments" fill="#10b981" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
 
-              <div className="bg-slate-800 rounded-2xl p-5 border border-slate-700">
-                <h3 className="text-white font-semibold text-sm mb-4">Appointment Status</h3>
-                <ResponsiveContainer width="100%" height={250}>
+              <div className="bg-slate-800 rounded-2xl p-4 border border-slate-700">
+                <h3 className="text-white font-semibold text-sm mb-3">Appointment Status</h3>
+                <ResponsiveContainer width="100%" height={200}>
                   <PieChart>
                     <Pie data={getStatusData()} cx="50%" cy="50%" labelLine={false}
                       label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={80} dataKey="value">
+                      outerRadius={70} dataKey="value">
                       {getStatusData().map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
                     </Pie>
                     <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }} itemStyle={{ color: '#e2e8f0' }} />
@@ -179,11 +175,11 @@ export default function dr() {
               </div>
 
               {getCallTypeData().length > 0 && (
-                <div className="bg-slate-800 rounded-2xl p-5 border border-slate-700">
-                  <h3 className="text-white font-semibold text-sm mb-4">Call Type Preference</h3>
-                  <ResponsiveContainer width="100%" height={250}>
+                <div className="bg-slate-800 rounded-2xl p-4 border border-slate-700">
+                  <h3 className="text-white font-semibold text-sm mb-3">Call Type Preference</h3>
+                  <ResponsiveContainer width="100%" height={200}>
                     <PieChart>
-                      <Pie data={getCallTypeData()} cx="50%" cy="50%" innerRadius={60} outerRadius={80}
+                      <Pie data={getCallTypeData()} cx="50%" cy="50%" innerRadius={50} outerRadius={70}
                         paddingAngle={5} dataKey="value"
                         label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
                         {getCallTypeData().map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
@@ -194,25 +190,19 @@ export default function dr() {
                 </div>
               )}
 
-              <div className="bg-slate-800 rounded-2xl p-5 border border-slate-700">
-                <h3 className="text-white font-semibold text-sm mb-4">📈 Quick Insights</h3>
-                <div className="space-y-3">
-                  <div className="bg-slate-700/40 rounded-lg p-3">
-                    <p className="text-slate-400 text-xs mb-1">Busiest Time Slot</p>
-                    <p className="text-white font-bold text-lg">
-                      {getTimeSlotData().reduce((max, slot) => slot.appointments > max.appointments ? slot : max, { time: 'N/A', appointments: 0 }).time}
-                    </p>
-                  </div>
-                  <div className="bg-slate-700/40 rounded-lg p-3">
-                    <p className="text-slate-400 text-xs mb-1">Completion Rate</p>
-                    <p className="text-emerald-400 font-bold text-lg">
-                      {appointments.length > 0 ? ((appointments.filter(a => a.status === "completed").length / appointments.length) * 100).toFixed(0) : 0}%
-                    </p>
-                  </div>
-                  <div className="bg-slate-700/40 rounded-lg p-3">
-                    <p className="text-slate-400 text-xs mb-1">Total Consultations</p>
-                    <p className="text-blue-400 font-bold text-lg">{doctor.totalConsultations || 0}</p>
-                  </div>
+              <div className="bg-slate-800 rounded-2xl p-4 border border-slate-700">
+                <h3 className="text-white font-semibold text-sm mb-3">📈 Quick Insights</h3>
+                <div className="space-y-2">
+                  {[
+                    ["Busiest Slot", getTimeSlotData().reduce((max, slot) => slot.appointments > max.appointments ? slot : max, { time: 'N/A', appointments: 0 }).time, "text-white"],
+                    ["Completion Rate", `${appointments.length > 0 ? ((appointments.filter(a => a.status === "completed").length / appointments.length) * 100).toFixed(0) : 0}%`, "text-emerald-400"],
+                    ["Total Consultations", doctor.totalConsultations || 0, "text-blue-400"],
+                  ].map(([label, val, color]) => (
+                    <div key={label} className="bg-slate-700/40 rounded-lg p-2.5 flex items-center justify-between">
+                      <p className="text-slate-400 text-xs">{label}</p>
+                      <p className={`font-bold text-base ${color}`}>{val}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -220,15 +210,15 @@ export default function dr() {
         )}
 
         {/* Filters */}
-        <div className="flex gap-2 mb-6 flex-wrap">
+        <div className="flex gap-2 mb-4 flex-wrap">
           {["all", "confirmed", "completed"].map((s) => (
             <button key={s} onClick={() => setFilterStatus(s)}
-              className={`text-xs px-4 py-2 rounded-full border transition-all capitalize ${filterStatus === s ? "bg-blue-600 border-blue-600 text-white" : "border-slate-700 text-slate-400 hover:border-slate-500"}`}>
+              className={`text-xs px-3 py-1.5 rounded-full border transition-all capitalize ${filterStatus === s ? "bg-blue-600 border-blue-600 text-white" : "border-slate-700 text-slate-400 hover:border-slate-500"}`}>
               {s}
             </button>
           ))}
           <button onClick={fetchAppointments}
-            className="ml-auto text-xs px-4 py-2 rounded-full border border-slate-700 text-slate-400 hover:border-slate-500 transition-all">
+            className="ml-auto text-xs px-3 py-1.5 rounded-full border border-slate-700 text-slate-400 hover:border-slate-500 transition-all">
             🔄 Refresh
           </button>
         </div>
@@ -237,72 +227,68 @@ export default function dr() {
 
         {/* Appointments */}
         {loadingAppts ? (
-          <div className="space-y-4">{[1,2,3].map((i) => <div key={i} className="h-28 rounded-2xl bg-slate-800 animate-pulse" />)}</div>
+          <div className="space-y-3">{[1,2,3].map((i) => <div key={i} className="h-24 rounded-2xl bg-slate-800 animate-pulse" />)}</div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="text-5xl mb-4">📋</div>
-            <p className="text-white font-semibold text-lg">No appointments today</p>
+          <div className="text-center py-12">
+            <div className="text-4xl mb-3">📋</div>
+            <p className="text-white font-semibold">No appointments today</p>
             <p className="text-slate-400 text-sm mt-1">Your schedule is clear</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {filtered.map((appt) => (
               <div key={appt._id}
-                className={`bg-slate-800 rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg ${appt.callStarted ? "border-blue-700/50 bg-blue-950/10" : "border-slate-700 hover:border-slate-600"}`}>
-                <div className="flex items-start justify-between gap-4 flex-wrap">
+                className={`bg-slate-800 rounded-2xl p-4 border transition-all duration-300 ${appt.callStarted ? "border-blue-700/50 bg-blue-950/10" : "border-slate-700"}`}>
+                <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-2 flex-wrap">
-                      <h3 className="text-white font-semibold text-base">{appt.patientName}</h3>
+                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                      <h3 className="text-white font-semibold text-sm">{appt.patientName}</h3>
                       <span className="text-slate-500 text-xs">Age {appt.patientAge}</span>
                       <span className={`text-xs px-2 py-0.5 rounded-full border ${statusStyle(appt.status, appt.callStarted)}`}>
                         {statusLabel(appt.status, appt.callStarted)}
                       </span>
                     </div>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
-                      <span className="text-slate-400">⏰ {appt.timeSlot}</span>
-                      <span className="text-slate-400">📍 {appt.patientVillage}</span>
-                      <span className="text-slate-400">📱 {appt.patientPhone}</span>
-                      <span className="text-slate-400">{appt.callType === "video" ? "📹 Video" : "📞 Audio"}</span>
+                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-slate-400">
+                      <span>⏰ {appt.timeSlot}</span>
+                      <span>📍 {appt.patientVillage}</span>
+                      <span>📱 {appt.patientPhone}</span>
+                      <span>{appt.callType === "video" ? "📹 Video" : "📞 Audio"}</span>
                     </div>
                     {appt.symptoms && (
-                      <p className="text-slate-500 text-xs mt-2 bg-slate-700/40 rounded-lg px-3 py-1.5 inline-block">
+                      <p className="text-slate-500 text-xs mt-1.5 bg-slate-700/40 rounded-lg px-2.5 py-1 inline-block">
                         🩺 {appt.symptoms}
                       </p>
                     )}
                   </div>
 
-                  <div className="flex flex-col gap-2 shrink-0">
-                    {/* Start Call */}
+                  <div className="flex flex-row sm:flex-col gap-2 shrink-0 flex-wrap">
                     {appt.status === "confirmed" && !appt.callStarted && (
                       <button onClick={() => handleStartCall(appt.bookingId)} disabled={startingCall === appt.bookingId}
-                        className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center gap-2 ${startingCall === appt.bookingId ? "bg-emerald-800 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-500 hover:scale-105"} text-white`}>
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${startingCall === appt.bookingId ? "bg-emerald-800 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-500"} text-white`}>
                         {startingCall === appt.bookingId
-                          ? <><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Starting...</>
+                          ? <><svg className="animate-spin w-3 h-3" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Starting...</>
                           : <>📹 Start Call</>}
                       </button>
                     )}
 
-                    {/* Rejoin Call */}
                     {appt.callStarted && appt.callLink && (
                       <button onClick={() => window.open(appt.callLink, '_blank', 'width=1200,height=800')}
-                        className="px-4 py-2 rounded-xl text-sm font-semibold bg-blue-600 hover:bg-blue-500 hover:scale-105 text-white transition-all duration-300">
-                        🔴 Rejoin Call
+                        className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white transition-all">
+                        🔴 Rejoin
                       </button>
                     )}
 
-                    {/* 💊 Write Prescription — only show after call started */}
                     {appt.status === "confirmed" && appt.callStarted && (
                       <button onClick={() => navigate(`/prescription/${appt.bookingId}`)}
-                        className="px-4 py-2 rounded-xl text-sm font-semibold bg-purple-600 hover:bg-purple-500 hover:scale-105 text-white transition-all duration-300">
-                        💊 Prescribe & Done
+                        className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-purple-600 hover:bg-purple-500 text-white transition-all">
+                        💊 Prescribe
                       </button>
                     )}
 
-                    {/* Completed — edit prescription */}
                     {appt.status === "completed" && (
                       <button onClick={() => navigate(`/prescription/${appt.bookingId}`)}
-                        className="px-4 py-2 rounded-xl text-sm font-semibold border border-purple-700 text-purple-400 hover:bg-purple-900/30 transition-all">
-                        📋 Edit Prescription
+                        className="px-3 py-1.5 rounded-xl text-xs font-semibold border border-purple-700 text-purple-400 hover:bg-purple-900/30 transition-all">
+                        📋 Edit Rx
                       </button>
                     )}
                   </div>
